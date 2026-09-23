@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# JCIAlert - what does NOT belong in the repo.
+#
+# Three kinds of thing, and they are excluded for three different reasons:
+#   1. build output      - reproducible from source, and 32 MB per copy
+#   2. the user's state  - seen.json and friends are a running install's
+#                          memory. Committing them means a clone starts
+#                          mid-history on someone else's story clusters.
+#   3. captured bytes    - fixtures/ and probe/ are real pages fetched from
+#                          Indonesian news sites. See README, "Tests".
+# ---------------------------------------------------------------------------
+
+# 1. Build output
+dist/
+build/
+*.spec
+installer/Output/
+installer/JCIAlert-portable/
+installer/*-portable.zip
+__pycache__/
+*.py[cod]
+
+# 2. Runtime state, written by a running app next to its own exe.
+#    config.json is NOT here: the tuned categories, the global_exclude list
+#    and the measured source settings ARE the product, and a clone that
+#    generated a bare default would be a markedly worse app.
+seen.json
+news.csv
+news.csv.1
+opened.json
+alerts.csv
+logs/
+.jcialert-write-test
+
+# 3. Captured third-party pages. `python probe_sources.py --save-fixtures
+#    fixtures` recaptures them; without them five suites skip and say so.
+fixtures/
+probe/
+
+# Editors and OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

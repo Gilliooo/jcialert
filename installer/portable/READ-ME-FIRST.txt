@@ -1,0 +1,63 @@
+JCIAlert 1.0.1 - Indonesian market news alerts
+==============================================
+
+TO INSTALL
+    Double-click  SETUP.bat
+
+    Installs into your own user profile
+    (%LOCALAPPDATA%\Programs\JCIAlert). No admin rights, no UAC prompt.
+    Adds a Start Menu shortcut and starts the app.
+
+TO REMOVE
+    Double-click  REMOVE.bat        keeps your settings and history
+                  REMOVE.bat /purge deletes those too
+
+
+THREE THINGS THAT SURPRISE PEOPLE
+---------------------------------
+
+1. NO TRAY ICON? Look under the ^ chevron in the tray first.
+   Windows 11 hides new tray icons there by default. Drag it out to pin it.
+   This is the commonest "it didn't work" and it always did.
+
+2. THE FIRST RUN IS QUIET ON PURPOSE.
+   Each news source's current backlog is recorded and NOT alerted, so you
+   don't get a hundred hours-old headlines at startup. Alerts begin with
+   the next story published after you start it.
+
+3. COPY THE WHOLE FOLDER, not just JCIAlert.exe.
+   emiten.json is 250 KB of ticker data and is deliberately not bundled
+   into the exe, so it can be refreshed without a rebuild. The exe on its
+   own cannot start.
+
+
+IF IT STILL DOESN'T APPEAR
+--------------------------
+    "%LOCALAPPDATA%\Programs\JCIAlert\JCIAlert.exe" --doctor
+
+It checks every reason it can fail to start - missing files, a folder it
+can't write to, a broken config, a second copy already running - and says
+which one, in a dialog. Also available from the tray: right-click ->
+Diagnostics...
+
+
+WINDOWS SMARTSCREEN
+-------------------
+It will warn the first time: "Windows protected your PC".
+Click "More info" -> "Run anyway". The app isn't code-signed; that needs a
+certificate, and nothing in the build can work around it.
+
+
+WHAT IT DOES
+------------
+Watches Indonesian financial news feeds and pops up when a headline names
+a ticker you care about. Right-click the tray icon:
+
+    News dashboard...   every headline it has seen, and why each did or
+                        did not alert. Also the source health tab.
+    Options...          watchlist, filters, sources, popup corner
+    Check now           poll immediately
+    Diagnostics...      why it isn't working
+
+Settings live in config.json next to the program. The watchlist is the
+main one: EMPTY MEANS EVERY TICKER, not none.

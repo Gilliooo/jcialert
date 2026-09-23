@@ -1,0 +1,221 @@
+{
+  "_comment_filters": "A headline alerts if ANY rule accepts it. Within one rule, every field you fill in must pass. AN EMPTY LIST MEANS 'ANY', NEVER 'NONE' - \"tickers\": [] matches every ticker, it does not match nothing.",
+  "_comment_terms": "Terms match on token boundaries, never as raw substrings, so 'laba' will not fire on 'kelabakan'. Indonesian affixes need wildcards: 'akuisisi*' (akuisisinya), '*akuisisi' (mengakuisisi), '*akuisisi*' (diakuisisinya). A multi-word term is a phrase and must appear as consecutive words.",
+  "_comment_confidence": "min_confidence is the floor for the ticker match itself: 1.00 the ticker in brackets, 0.90 the company name, 0.60 a bare ticker. Raise it for market-wide rules, keep it near 0.5 for your own coverage.",
+  "global_exclude": [
+    "rekomendasi saham",
+    "prediksi zodiak",
+    "harga emas antam"
+  ],
+  "_comment_categories": "Named keyword bundles, so the common case is two clicks instead of twenty keywords. Edit freely - they are not a fixed taxonomy.",
+  "categories": {
+    "corporate_action": [
+      "buyback",
+      "buy back",
+      "beli kembali",
+      "dividen",
+      "tebar dividen",
+      "stock split",
+      "reverse stock",
+      "right issue",
+      "rights issue",
+      "hmetd",
+      "saham bonus",
+      "tender offer",
+      "obligasi",
+      "sukuk",
+      "kupon"
+    ],
+    "ma": [
+      "akuisisi*",
+      "*akuisisi*",
+      "merger",
+      "caplok",
+      "ambil alih",
+      "divestasi",
+      "pengendali baru",
+      "pemegang saham pengendali",
+      "*akuisisi",
+      "joint venture",
+      "usaha patungan"
+    ],
+    "earnings": [
+      "laba",
+      "rugi",
+      "kinerja",
+      "pendapatan",
+      "penjualan",
+      "margin",
+      "laporan keuangan",
+      "kuartal",
+      "semester",
+      "*tahunan",
+      "ebitda",
+      "top line",
+      "bottom line"
+    ],
+    "governance": [
+      "rups",
+      "rupslb",
+      "rupst",
+      "direktur",
+      "direksi",
+      "komisaris",
+      "dirut",
+      "mundur",
+      "resign",
+      "tunjuk",
+      "rombak",
+      "pengunduran diri"
+    ],
+    "capital": [
+      "ipo",
+      "private placement",
+      "penambahan modal",
+      "pmhmetd",
+      "pmthmetd",
+      "rights issue",
+      "penawaran umum",
+      "book building",
+      "listing perdana"
+    ],
+    "regulatory": [
+      "suspensi",
+      "suspend",
+      "notasi khusus",
+      "gembok",
+      "delisting",
+      "denda",
+      "sanksi",
+      "ojk",
+      "bei",
+      "idx",
+      "pailit",
+      "pkpu"
+    ],
+    "operations": [
+      "kontrak",
+      "tender",
+      "proyek",
+      "ekspansi",
+      "pabrik",
+      "produksi",
+      "kapasitas",
+      "akuisisi lahan",
+      "smelter",
+      "tambang"
+    ],
+    "guidance": [
+      "target",
+      "proyeksi",
+      "outlook",
+      "guidance",
+      "capex",
+      "rencana",
+      "optimistis",
+      "prospek"
+    ]
+  },
+  "_comment_rules": "Order affects only which rule name is reported, never whether something alerts. Set require_ticker false for a keyword-only rule (index or macro news with no company in it) - but then give it categories or keywords, or it accepts the entire feed.",
+  "rules": [
+    {
+      "name": "My coverage - everything",
+      "enabled": true,
+      "tickers": [
+        "BBCA",
+        "BBRI",
+        "BMRI",
+        "BBNI"
+      ],
+      "categories": [],
+      "require": [],
+      "any_of": [],
+      "exclude": [],
+      "sources": [],
+      "min_confidence": 0.5,
+      "require_ticker": true
+    },
+    {
+      "name": "Sector - corporate actions and M&A only",
+      "enabled": true,
+      "tickers": [
+        "ADHI",
+        "PTPP",
+        "WIKA",
+        "WTON",
+        "JSMR"
+      ],
+      "categories": [
+        "corporate_action",
+        "ma"
+      ],
+      "require": [],
+      "any_of": [],
+      "exclude": [],
+      "sources": [],
+      "min_confidence": 0.5,
+      "require_ticker": true
+    },
+    {
+      "name": "Market-wide - never miss a suspension",
+      "enabled": true,
+      "tickers": [],
+      "categories": [
+        "regulatory"
+      ],
+      "require": [],
+      "any_of": [
+        "suspensi",
+        "suspend",
+        "gembok",
+        "delisting"
+      ],
+      "exclude": [],
+      "sources": [],
+      "min_confidence": 0.85,
+      "require_ticker": true
+    },
+    {
+      "name": "Earnings on coverage, minus the weekly movers tables",
+      "enabled": true,
+      "tickers": [
+        "BBCA",
+        "BBRI",
+        "BMRI",
+        "BBNI"
+      ],
+      "categories": [
+        "earnings"
+      ],
+      "require": [],
+      "any_of": [],
+      "exclude": [
+        "top losers",
+        "top gainers",
+        "sepekan",
+        "rekomendasi"
+      ],
+      "sources": [],
+      "min_confidence": 0.5,
+      "require_ticker": true
+    },
+    {
+      "name": "Index and macro (keyword-only, no ticker needed)",
+      "enabled": false,
+      "tickers": [],
+      "categories": [],
+      "require": [],
+      "any_of": [
+        "ihsg",
+        "bi rate",
+        "suku bunga",
+        "net buy",
+        "net sell"
+      ],
+      "exclude": [],
+      "sources": [],
+      "min_confidence": 0.0,
+      "require_ticker": false
+    }
+  ]
+}
