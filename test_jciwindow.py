@@ -388,6 +388,60 @@ def main():
     check("nor is a key this version has no widget for",
           saved and saved[0].get("future_key") == {"from": "a newer version"})
 
+    print("\n== and they survive ONE LEVEL DOWN, inside a source ==")
+    # Real loss, 2026-09-23: a single Save through Options ate the `_f_tick`
+    # density measurement off all nine sources. The Sources tab is a column of
+    # checkboxes, so the form can only say `enabled` - and the old code wrote
+    # that map over the top of the real one. The rule above only ever held at
+    # the top level, which is exactly why nothing caught it.
+    cfg4 = O.default_config()
+    cfg4["sources"] = {"katadata": {"enabled": True, "_f_tick": "33%"},
+                       "detik-finance": {"enabled": False,
+                                         "_f_tick": "0% of 17 fresh items"}}
+    srcs = [types.SimpleNamespace(name="katadata", enabled=True),
+            types.SimpleNamespace(name="detik-finance", enabled=False)]
+    root, saved, shown = build(cfg4, srcs)
+    by = {b.kw.get("text"): b for b in buttons(root)}
+    by["Save"].command()
+    got = saved[0].get("sources") if saved else {}
+    check("a per-source annotation is not eaten",
+          got.get("katadata", {}).get("_f_tick") == "33%", got)
+    check("nor on a source the user left disabled",
+          got.get("detik-finance", {}).get("_f_tick") == "0% of 17 fresh items",
+          got)
+    check("while the checkbox still owns 'enabled'",
+          got.get("katadata", {}).get("enabled") is True
+          and got.get("detik-finance", {}).get("enabled") is False, got)
+
+    # ...and a flipped checkbox must still be the value that wins. Both are
+    # flipped at once because validate() rightly refuses to save a config with
+    # every source disabled.
+    root, saved, shown = build(cfg4, srcs)
+    boxes = {w.kw.get("text"): w for w in widgets(root, W)
+             if type(w).__name__ == "Checkbutton"}
+    boxes["katadata"].kw["variable"].set(False)
+    boxes["detik-finance"].kw["variable"].set(True)
+    {b.kw.get("text"): b for b in buttons(root)}["Save"].command()
+    got = saved[0].get("sources") if saved else {}
+    check("flipping a checkbox saves the flip, and keeps the measurement",
+          got.get("katadata") == {"enabled": False, "_f_tick": "33%"}
+          and got.get("detik-finance", {}).get("enabled") is True, got)
+
+    print("\n== the About button links out without a dialog ==")
+    root, saved, shown = build()
+    about = [b for b in buttons(root) if b.kw.get("text") == JW.ABOUT_TEXT]
+    check("it is there, and says who made this", len(about) == 1)
+    opened = []
+    real_open = JW.webbrowser.open
+    JW.webbrowser.open = lambda url: (opened.append(url), True)[1]
+    try:
+        about[0].command()
+    finally:
+        JW.webbrowser.open = real_open
+    check("clicking it opens the LinkedIn URL, nothing else",
+          opened == [JW.ABOUT_URL], opened)
+    check("and it saves nothing", saved == [], saved)
+
     print("\n== the corner is a dropdown, and it round-trips ==")
     cfgc = O.default_config()
     cfgc["corner"] = "top left"

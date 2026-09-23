@@ -42,10 +42,14 @@ helpers, which return NEW lists - so the widget owns no state that could drift
 from the config, and Cancel is simply "do not write".
 """
 
+import webbrowser
+
 import jcifilter
 import jcioptions
 
 TITLE = "JCIAlert Options"
+ABOUT_TEXT = "Made by Bill Grandy Tunjung"
+ABOUT_URL = "https://www.linkedin.com/in/bill-tunjung/"
 GEOMETRY = "700x660"
 MIN_SIZE = (640, 580)
 
@@ -143,8 +147,24 @@ def open_window(cfg, save, sources=None, tk=None, ttk=None, messagebox=None):
     # the notebook, however tidy that would look.
     bar = tk.Frame(root)
     bar.pack(side="bottom", fill="x", padx=10, pady=8)
+
+    # Bottom-left About: a link, not a dialog. A browser that refuses to open
+    # must not take the Options window down with it - and `webbrowser.open`
+    # signals that failure by RETURNING FALSE, only raising in the narrower
+    # no-browser-registered case. Catching the exception alone would leave the
+    # likely failure silent, so both paths fall through to showing the URL.
+    def about():
+        try:
+            if webbrowser.open(ABOUT_URL):
+                return
+        except Exception:
+            pass
+        status.config(text=ABOUT_URL)
+
+    tk.Button(bar, text=ABOUT_TEXT, command=about,
+              relief="flat", fg="#0a66c2", cursor="hand2").pack(side="left")
     status = tk.Label(bar, text="", anchor="w")
-    status.pack(side="left", fill="x", expand=True)
+    status.pack(side="left", fill="x", expand=True, padx=(8, 0))
 
     nb = ttk.Notebook(root)
     nb.pack(side="top", fill="both", expand=True, padx=10, pady=(10, 0))

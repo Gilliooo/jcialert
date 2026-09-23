@@ -140,7 +140,18 @@ def apply_values(cfg, values):
     if "watchlist" in values:
         out["watchlist"] = [t.strip().upper() for t in _lines(values["watchlist"])]
     if "sources" in values:
-        out["sources"] = copy.deepcopy(values["sources"])
+        # MERGE, do not replace. The Sources tab is a column of checkboxes, so
+        # the form can only ever say `enabled` - while config.json carries
+        # `_f_tick` density measurements per source that _sources_note tells
+        # you to decide enable/disable by. A wholesale replace ate all nine of
+        # them on a single Save (2026-09-23). Rule 1 applies one level down too.
+        # Consequence, and the right trade: a source that no longer exists
+        # keeps its config entry. A stale key is harmless; a lost measurement
+        # is not.
+        srcs = copy.deepcopy(out.get("sources") or {})
+        for name, got in (values["sources"] or {}).items():
+            srcs[name] = {**(srcs.get(name) or {}), **copy.deepcopy(got)}
+        out["sources"] = srcs
 
     filters = dict(out.get("filters") or {})
     if "global_exclude" in values:

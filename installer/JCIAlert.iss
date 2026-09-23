@@ -39,7 +39,7 @@
 #define ExeName      "JCIAlert.exe"
 #define AppMutexName "Global\JCIAlertTray"
 ; Kept in step with jci.VERSION by test_installer.py - they drift otherwise.
-#define AppVersion   "1.0.1"
+#define AppVersion   "1.1"
 
 [Setup]
 AppId={{8F3C21E4-6B7A-4D59-9E2F-JCIALERT0001}

@@ -2,6 +2,31 @@
 
 Dates are when the change was made, not when it was released.
 
+## 1.1 — 2026-09-23
+
+### Fixed
+
+- **A Save through Options ate the per-source `_f_tick` measurements.** The
+  Sources tab is a column of checkboxes, so the form can only ever say
+  `enabled` — and `apply_values` wrote that map straight over the real one,
+  taking all eight density readings with it. `_sources_note` tells you to set
+  enable/disable *by* those readings, so the setting that survived was the one
+  you could no longer justify. It now merges per source. Rule 1 of
+  `jcioptions` ("preserve what it does not understand") was only ever
+  implemented at the top level; it holds one level down now, and
+  `test_jciwindow.py` covers that depth.
+
+  The trade, deliberate: a source dropped from `jcisource` now keeps its
+  config entry instead of vanishing on save. A stale key is harmless, a lost
+  measurement is not.
+
+### Added
+
+- **An About button, bottom-left of the Options window.** Opens the author's
+  LinkedIn. `webbrowser.open` signals failure by returning False and only
+  raises in the narrower no-browser case, so both paths fall back to showing
+  the URL in the status line rather than failing silently.
+
 ## 1.0.1 — 2026-09-23
 
 ### Removed
