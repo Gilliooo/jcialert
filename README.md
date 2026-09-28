@@ -175,6 +175,32 @@ run_tests.bat
 15 suites, offline, run by `build.bat` before it builds. A suite that can't
 run (e.g. `fixtures/` missing) prints a banner and still exits 0.
 
+## Roadmap
+
+- **New sources, fix failing ones** — `cnbc-market`, `kontan-keuangan`,
+  `liputan6-bisnis`, `detik-finance`, `wartaekonomi` are wired but off by
+  default pending a weekday measurement run; `kompas-money` scrapes its
+  index page (no RSS left) and is also off. `bisnis.com`, `idnfinancials`
+  are dead (403 on every path tried, confirmed twice). See `jcisource.py`'s
+  end-of-file notes for what's been tried.
+- **Cloud migration for 24/7 capture** — the app only polls while the
+  desktop it's running on is on. Needs a server-side poller, a real
+  datastore in place of `news.csv`/`seen.json` (single-process file
+  assumptions won't hold), and a way to reach an alert to someone not
+  watching a tray icon.
+- **In-app emiten.json refresh** — a button/menu item to pull IDX's listed-
+  company registry and rebuild the ticker table without leaving the app,
+  instead of running `build_aliases.py --report` by hand. Needs a
+  background thread (IDX fetch is slow and can fail) and a way to swap the
+  running `Table` on a live `Engine`, which doesn't exist yet.
+- **Macro keyword tuning** — `macro_*` categories in `jcifilter.py` are
+  starter terms, not yet tuned against a day of real headlines the way
+  `corporate_action`/`ma`/etc. were. See `SPEC-macro-tagging.md`.
+- **Real datastore** — `news.csv`, `seen.json`, `opened.json` are
+  single-writer file assumptions baked into `jciengine.py`. Fine for one
+  desktop process; blocks the cloud-migration item above until replaced,
+  since multi-instance or concurrent access breaks them first.
+
 ## Contributing
 
 Open an issue before a large change — this is a personal tool with unusual
