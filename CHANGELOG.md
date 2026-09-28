@@ -2,6 +2,20 @@
 
 Dates are when the change was made, not when it was released.
 
+## 1.2.2 — 2026-09-28
+
+### Added
+
+- **Four more Macroeconomics indicators: Gold, Interest Rate, Unemployment
+  Rate, GDP.** Same mechanism as the original five (v1.2) — a
+  `require_ticker: False` + `categories` rule per indicator, its own
+  Options checkbox, its own popup label. No config-schema change, no new
+  UI code; the Macroeconomics section, popup grouping and dashboard filter
+  already drove off the indicator list generically.
+
+  Keyword lists are starting terms, same caveat as v1.2's five — not yet
+  tuned against real headlines.
+
 ## 1.2 — 2026-09-28
 
 ### Added

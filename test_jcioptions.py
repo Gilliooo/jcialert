@@ -266,7 +266,7 @@ def main():
 
     print("\n== the Macroeconomics checkbox group ==")
     fresh = O.read_values(O.default_config())["rules"]
-    check("a config with no macro rules at all gets all five, seeded",
+    check("a config with no macro rules at all gets all nine, seeded",
           set(O.macro_state(fresh)) == set(F.MACRO_LABELS))
     check("and every one starts off",
           all(v is False for v in O.macro_state(fresh).values()),
@@ -319,7 +319,7 @@ def main():
           reread["macro_oil"] is True, reread)
 
     # Reported bug: an existing config.json whose `categories` dict predates
-    # this feature (real entries, none of them macro_*) got the five macro
+    # this feature (real entries, none of them macro_*) got the macro
     # RULES seeded fine, but nothing seeded the matching macro CATEGORIES -
     # so validate() rejected every one of them as "unknown category". Opening
     # Options on any pre-existing config hit this, every time.
@@ -339,8 +339,8 @@ def main():
     check("and keeps every category the old config already had",
           set(pre_existing["filters"]["categories"]) <= set(v["categories"]))
     errs = O.validate(v, pre_existing)
-    check("an old config's five seeded macro rules validate cleanly - the "
-          "actual bug: this used to report 5 'unknown category' errors",
+    check("an old config's seeded macro rules validate cleanly - the "
+          "actual bug: this used to report 'unknown category' errors",
           errs == [], errs)
 
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")

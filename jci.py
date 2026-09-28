@@ -40,7 +40,7 @@ import jcioptions
 import jcisource
 import jciview
 
-VERSION = "1.2"
+VERSION = "1.2.2"
 APP = "JCIAlert " + VERSION
 WIB = timezone(timedelta(hours=7))
 

@@ -472,7 +472,7 @@ def main():
           [e[1] for e in log if e[0] == "tab"])
     boxes = {w.kw.get("text"): w for w in widgets(root, W)
              if type(w).__name__ == "Checkbutton"}
-    check("the master checkbox and all five indicators are rendered",
+    check("the master checkbox and all nine indicators are rendered",
           {"Macroeconomics (all)", *F.MACRO_LABELS.values()} <= set(boxes),
           sorted(boxes))
     check("every indicator starts unchecked",
@@ -488,7 +488,7 @@ def main():
                      if "macro_oil" in (r.get("categories") or [])), None)
     check("checking Oil and saving enables exactly that rule",
           oil_rule is not None and oil_rule["enabled"] is True, oil_rule)
-    check("the other four stay off",
+    check("the other eight stay off",
           sum(1 for r in got_rules
               if set(r.get("categories") or []) & set(F.MACRO_LABELS)
               and r["enabled"]) == 1, got_rules)
@@ -509,12 +509,12 @@ def main():
     by = {b.kw.get("text"): b for b in buttons(root)}
     by["Save"].command()
     got_rules = saved[0]["filters"]["rules"] if saved else []
-    check("'(all)' saved enables all five macro rules",
+    check("'(all)' saved enables all nine macro rules",
           sum(1 for r in got_rules
               if set(r.get("categories") or []) & set(F.MACRO_LABELS)
-              and r["enabled"]) == 5, got_rules)
+              and r["enabled"]) == 9, got_rules)
     check("and nothing else got swept up in the bulk toggle",
-          sum(1 for r in got_rules if r["enabled"]) == 6,   # 5 macro + coverage
+          sum(1 for r in got_rules if r["enabled"]) == 10,  # 9 macro + coverage
           [r["name"] for r in got_rules if r["enabled"]])
 
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")

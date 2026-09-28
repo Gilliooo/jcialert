@@ -463,13 +463,17 @@ def main():
     H_OIL = "Harga Minyak Dunia Naik Usai OPEC Pangkas Produksi"
     H_INFLATION = "Inflasi RI Agustus Tercatat 2,12 Persen Secara Tahunan"
     H_RUPIAH = "Rupiah Melemah ke Rp15.950 per Dolar AS"
+    H_GOLD = "Harga Emas Dunia Melonjak ke Level Tertinggi Baru, Investor Buru Aset Aman"
+    H_INTEREST_RATE = "Bank Sentral Dunia Ramai Naikkan Suku Bunga Global, Investor Waspadai Dampak ke Pasar Saham"
+    H_UNEMPLOYMENT = "BPS Catat Tingkat Pengangguran Terbuka RI Turun Jadi 4,8 Persen"
+    H_GDP = "Pertumbuhan Ekonomi RI Kuartal III Tercatat 5,1 Persen, Lampaui Ekspektasi Pasar"
     # The false positive this category has to avoid: cooking oil, not crude.
     H_COOKING_OIL = "Harga Minyak Goreng Turun di Pasar Tradisional"
 
-    check("all five macro rules ship disabled by default",
+    check("all nine macro rules ship disabled by default",
           all(r["enabled"] is False for r in F.MACRO_RULES),
           [r["name"] for r in F.MACRO_RULES])
-    check("all five are require_ticker=False, single-category",
+    check("all nine are require_ticker=False, single-category",
           all(r["require_ticker"] is False and len(r["categories"]) == 1
               for r in F.MACRO_RULES))
 
@@ -479,6 +483,10 @@ def main():
         (H_OIL, "macro_oil", "Oil"),
         (H_INFLATION, "macro_inflation", "Inflation"),
         (H_RUPIAH, "macro_rupiah", "Rupiah"),
+        (H_GOLD, "macro_gold", "Gold"),
+        (H_INTEREST_RATE, "macro_interest_rate", "Interest Rate"),
+        (H_UNEMPLOYMENT, "macro_unemployment", "Unemployment Rate"),
+        (H_GDP, "macro_gdp", "GDP"),
     ):
         one = dict(next(r for r in F.MACRO_RULES if cat in r["categories"]),
                    enabled=True)
@@ -490,7 +498,7 @@ def main():
         others = [dict(r, enabled=True) for r in F.MACRO_RULES
                   if cat not in r["categories"]]
         d2 = fs(others).evaluate(headline, [])
-        check(f"{label}: the OTHER four indicators do not also fire on it",
+        check(f"{label}: the OTHER eight indicators do not also fire on it",
               d2.alert is False, d2)
 
     d = fs(dict(next(r for r in F.MACRO_RULES if "macro_oil" in r["categories"]),

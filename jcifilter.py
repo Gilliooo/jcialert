@@ -224,6 +224,20 @@ DEFAULT_CATEGORIES = {
     "macro_rupiah": [
         "rupiah melemah", "rupiah menguat", "kurs rupiah", "nilai tukar",
     ],
+    "macro_gold": [
+        "harga emas dunia", "emas dunia", "gold price", "harga emas global",
+    ],
+    "macro_interest_rate": [
+        "suku bunga global", "bank sentral dunia", "kenaikan suku bunga",
+        "penurunan suku bunga",
+    ],
+    "macro_unemployment": [
+        "tingkat pengangguran", "pengangguran terbuka", "klaim pengangguran",
+        "non farm payroll",
+    ],
+    "macro_gdp": [
+        "produk domestik bruto", "pertumbuhan ekonomi", "gdp", "pdb",
+    ],
 }
 
 # One rule per macro indicator, OFF by default - see SPEC-macro-tagging.md.
@@ -276,6 +290,42 @@ MACRO_RULES = [
         "min_confidence": 0.0,
         "require_ticker": False,
     },
+    {
+        "name": "Macroeconomics: Gold",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_gold"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: Interest Rate",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_interest_rate"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: Unemployment Rate",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_unemployment"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: GDP",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_gdp"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
 ]
 
 # category id -> the label the Options checkbox and the popup both show.
@@ -288,13 +338,17 @@ MACRO_LABELS = {
     "macro_oil": "Oil",
     "macro_inflation": "Inflation",
     "macro_rupiah": "Rupiah",
+    "macro_gold": "Gold",
+    "macro_interest_rate": "Interest Rate",
+    "macro_unemployment": "Unemployment Rate",
+    "macro_gdp": "GDP",
 }
 
 
 def ensure_macro_rules(rules):
-    """Add whichever of the five macro rules are missing from `rules`,
+    """Add whichever of the nine macro rules are missing from `rules`,
     disabled. Both a brand-new config.json and every config.json written
-    before this feature existed are missing all five - load_config calls
+    before this feature existed are missing all nine - load_config calls
     this on every load so the Macroeconomics checkboxes always have a rule
     to bind to, for new and upgraded installs alike.
 
@@ -314,12 +368,12 @@ def ensure_macro_rules(rules):
 
 
 def ensure_macro_categories(categories):
-    """Add whichever of the five `macro_*` keyword bundles are missing from
+    """Add whichever of the nine `macro_*` keyword bundles are missing from
     `categories`. Same reason as ensure_macro_rules, and the bug that made it
     necessary: a rule naming `macro_oil` in its categories list is useless -
     `validate()` rejects it as "unknown category" - if `macro_oil` itself was
     never added to the categories dict. An existing config.json's categories
-    are kept completely as they are; only the five missing keys are added.
+    are kept completely as they are; only the missing keys are added.
     """
     out = dict(categories or {})
     for cat, terms in DEFAULT_CATEGORIES.items():

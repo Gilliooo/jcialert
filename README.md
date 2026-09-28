@@ -8,10 +8,11 @@ Sibling to IDXAlert (same interface, different feed: corporate news vs IDX
 disclosures). Runs side by side with it — separate config, `seen.json`, Run
 key, mutex, tray icon. Don't share any of that between the two.
 
-## What's new — 1.2
+## What's new — 1.2.2
 
 **Macroeconomics alerting, no ticker needed:** BI Rate, The Fed, Oil,
-Inflation, Rupiah. Off by default — check one in the Macroeconomics tab in
+Inflation, Rupiah, Gold, Interest Rate, Unemployment Rate, GDP. Off by
+default — check one in the Macroeconomics tab in
 Options and a keyword-matched headline for that indicator alerts even though
 no company is named in it. Fires under its own popup label ("OIL", "BI RATE",
 ...), never lumped into the generic ticker-less bucket, and is filterable in

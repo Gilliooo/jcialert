@@ -341,7 +341,7 @@ def open_window(cfg, save, sources=None, tk=None, ttk=None, messagebox=None):
             ("Down", lambda rs, i: jcioptions.move_rule(rs, i, 1))):
         tk.Button(btns, text=label, command=act_wrapped(fn)).pack(side="left")
 
-    # ---- Macroeconomics - a simplified checkbox view over five of the SAME
+    # ---- Macroeconomics - a simplified checkbox view over nine of the SAME
     # rules the Filters tab above already edits (matched by category, see
     # jcioptions._macro_index). No ticker needed for any of these; off by
     # default. Toggling here or in the Filters tab keeps the other in sync,
