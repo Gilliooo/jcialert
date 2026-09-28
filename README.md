@@ -11,18 +11,18 @@ key, mutex, tray icon. Don't share any of that between the two.
 ## What's new — 1.2
 
 **Macroeconomics alerting, no ticker needed:** BI Rate, The Fed, Oil,
-Inflation, Rupiah. Off by default — check one in **Options → Macroeconomics**
-and a keyword-matched headline for that indicator alerts even though no
-company is named in it. Fires under its own popup label ("OIL", "BI RATE",
+Inflation, Rupiah. Off by default — check one in the Macroeconomics tab in
+Options and a keyword-matched headline for that indicator alerts even though
+no company is named in it. Fires under its own popup label ("OIL", "BI RATE",
 ...), never lumped into the generic ticker-less bucket, and is filterable in
 the dashboard the same way `ticker` already is. Keyword lists are a starting
 point, not yet tuned against real headlines the way the corporate-action/M&A
 categories were — see `SPEC-macro-tagging.md`.
 
-Also in this release: the portable zip no longer installs anything (unzip,
-run `JCIAlert.exe`, done — `SETUP.bat`/`REMOVE.bat` are gone), and
-`build.bat` no longer pops a real Windows dialog partway through the test run.
-Full list: `CHANGELOG.md`.
+Also: the portable zip no longer installs anything (unzip, run
+`JCIAlert.exe`, done — `SETUP.bat`/`REMOVE.bat` are gone), and `build.bat`
+no longer pops a real Windows dialog partway through the test run. Full
+list: `CHANGELOG.md`.
 
 ---
 
