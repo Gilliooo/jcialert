@@ -14,7 +14,6 @@
 dist/
 build/
 *.spec
-installer/Output/
 installer/JCIAlert-portable/
 installer/*-portable.zip
 __pycache__/

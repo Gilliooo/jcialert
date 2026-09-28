@@ -1,5 +1,11 @@
 # JCIAlert
 
+## Download
+
+**[JCIAlert 1.2.2 (portable, no install)](https://github.com/Gilliooo/jcialert/releases/download/v1.2.2/JCIAlert-1.2.2-portable.zip)**
+— unzip, run `JCIAlert.exe`. Needs `emiten.json` next to it (included in the
+zip). See [Installation](#installation) below for details.
+
 Windows tray app. Watches Indonesian corporate news feeds, pops up when a
 headline names a ticker on your watchlist. Python stdlib only, plus `pystray`
 + `pillow` for the tray icon, tkinter for windows.
@@ -37,7 +43,6 @@ python -m pip install pystray pillow pyinstaller
 run_tests.bat             15 suites, offline, ~10s
 build.bat                 tests, then dist\JCIAlert.exe
 make_portable.bat         dist -> installer\JCIAlert-<version>-portable.zip
-make_installer.bat        all of the above, then the Inno Setup .exe
 ```
 
 Needs Python 3.10+ on Windows. `run_tests.bat` needs nothing but Python.
@@ -48,7 +53,7 @@ Building the exe needs the three pip packages above.
 | missing | effect | fix |
 |---|---|---|
 | `fixtures/` | parser/end-to-end tests are skipped (banner, not silent) | `python probe_sources.py --save-fixtures fixtures` — from Indonesia, weekday, market hours |
-| `dist/`, portable zip, `installer/Output/` | nothing to install yet | `make_installer.bat` |
+| `dist/`, portable zip | nothing to run yet | `build.bat` then `make_portable.bat` |
 
 `emiten.json` (ticker/company names) **is** in the repo — app won't start
 without it. Refresh with `python build_aliases.py --report`.
@@ -58,22 +63,14 @@ watchlist is empty, which means **every ticker, not none**.
 
 ## Installation
 
-```
-make_installer.bat        -> installer\Output\JCIAlert-Setup-<version>.exe
-```
+No installer — unzip `installer\JCIAlert-<version>-portable.zip` (built by
+`make_portable.bat`, or grab a prebuilt one from
+[Releases](https://github.com/Gilliooo/jcialert/releases)) and run
+`JCIAlert.exe`. Settings and history are written next to the exe, so the
+whole folder is the app; delete the folder to remove it.
 
-Needs [Inno Setup 6](https://jrsoftware.org/isdl.php). Installs per-user to
-`%LOCALAPPDATA%\Programs\JCIAlert`, no admin, no UAC. An upgrade replaces
-only `JCIAlert.exe` and `emiten.json` — your `config.json`, `seen.json`,
-`news.csv`, `logs\` stay untouched. Uninstaller asks before deleting them.
-
-**No Inno Setup / blocked installers:** unzip
-`installer\JCIAlert-<version>-portable.zip` and run `JCIAlert.exe` — nothing
-to install. Settings and history are written next to the exe, so the whole
-folder is the app; delete the folder to remove it.
-
-Neither the installer nor the portable exe is signed — SmartScreen will warn
-once ("More info" → "Run anyway").
+The exe is not signed — SmartScreen will warn once ("More info" → "Run
+anyway").
 
 ## How to use it
 

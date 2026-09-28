@@ -43,7 +43,7 @@ MODULES = ["build_aliases.py", "jcimatch.py", "jcifilter.py", "jcisource.py",
            "test_jcisource.py", "test_jciengine.py", "test_jcinet.py",
            "test_jciview.py", "test_jcioptions.py", "test_jci.py",
            "test_jcitray.py", "test_jciwindow.py", "test_jcidash.py",
-           "test_jcidashwindow.py", "test_jcidoctor.py", "test_installer.py"]
+           "test_jcidashwindow.py", "test_jcidoctor.py", "test_portable.py"]
 
 failures = []
 

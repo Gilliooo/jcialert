@@ -240,7 +240,7 @@ def main():
           "chevron" in bb)
 
     print("\n== a pre-build suite must not need the build's own output ==")
-    # test_installer.py asserted dist\JCIAlert.exe existed while running at
+    # test_portable.py asserted dist\JCIAlert.exe existed while running at
     # build.bat line 42, with PyInstaller at line 55. From a clean tree a green
     # build was impossible; it passed once only because a stale exe was lying
     # around. Same shape as the running-exe bug an hour earlier: a check that

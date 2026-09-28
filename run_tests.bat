@@ -50,7 +50,7 @@ echo.
 python test_jcidoctor.py
 if errorlevel 1 exit /b 1
 echo.
-python test_installer.py
+python test_portable.py
 if errorlevel 1 exit /b 1
 echo.
 if not exist "fixtures\*.xml" (
