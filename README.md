@@ -31,6 +31,26 @@ Also: the portable zip no longer installs anything (unzip, run
 no longer pops a real Windows dialog partway through the test run. Full
 list: `CHANGELOG.md`.
 
+## Features
+
+- **Ticker matching:** parenthetical `(BMRI)`, company alias ("Bank
+  Mandiri"), or bare 4-letter ticker, each at its own confidence level.
+- **Macroeconomics alerting:** BI Rate, The Fed, Oil, Inflation, Rupiah,
+  Gold, Interest Rate, Unemployment Rate, GDP. No ticker needed, each an
+  opt-in toggle with its own popup label.
+- **Rule-based filters:** tickers, categories, keyword terms (exact,
+  prefix/suffix, phrase), source, confidence. Rules OR together; fields
+  within one rule AND.
+- **Story clustering:** one alert per story. Later coverage of the same
+  ticker joins the existing popup row instead of triggering a new alert.
+- **News dashboard:** every headline seen, not just alerts. Searchable,
+  filterable by ticker, source, status, category, with the reason each one
+  was accepted or rejected.
+- **Per-source health:** failure and cooldown tracking per feed, shown live
+  in the dashboard's Status tab.
+- **Portable tray app:** no admin, no install. Settings and history live
+  next to the exe.
+
 ---
 
 ## Setup (build from source)
