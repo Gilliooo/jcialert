@@ -8,6 +8,22 @@ Sibling to IDXAlert (same interface, different feed: corporate news vs IDX
 disclosures). Runs side by side with it — separate config, `seen.json`, Run
 key, mutex, tray icon. Don't share any of that between the two.
 
+## What's new — 1.2
+
+**Macroeconomics alerting, no ticker needed:** BI Rate, The Fed, Oil,
+Inflation, Rupiah. Off by default — check one in **Options → Macroeconomics**
+and a keyword-matched headline for that indicator alerts even though no
+company is named in it. Fires under its own popup label ("OIL", "BI RATE",
+...), never lumped into the generic ticker-less bucket, and is filterable in
+the dashboard the same way `ticker` already is. Keyword lists are a starting
+point, not yet tuned against real headlines the way the corporate-action/M&A
+categories were — see `SPEC-macro-tagging.md`.
+
+Also in this release: the portable zip no longer installs anything (unzip,
+run `JCIAlert.exe`, done — `SETUP.bat`/`REMOVE.bat` are gone), and
+`build.bat` no longer pops a real Windows dialog partway through the test run.
+Full list: `CHANGELOG.md`.
+
 ---
 
 ## Setup (build from source)
@@ -75,8 +91,9 @@ alerted, so you don't get a hundred old headlines at startup.
   alerts. `Show everything` widens to rejected ones; `Why / rule` column
   says which rule accepted or which gate rejected. Search/ticker/source/date
   filters. Click a column to sort. **Status** tab shows per-source health.
-- **Options** — speed, grouping, alerts, watchlist, sources, filters.
-  Refuses to save a config that could never alert.
+- **Options** — speed, grouping, alerts, watchlist, sources, filters,
+  macroeconomics (BI Rate/Fed/Oil/Inflation/Rupiah, no ticker needed, off
+  by default). Refuses to save a config that could never alert.
 
 **Key settings:**
 
