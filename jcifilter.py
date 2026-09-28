@@ -104,6 +104,7 @@ deliberately inert, so a stray asterisk cannot match the whole feed.
 Standard library only.
 """
 
+import copy
 import re
 
 from jcimatch import tokens
@@ -199,7 +200,117 @@ DEFAULT_CATEGORIES = {
         "masyarakat", "edukasi", "literasi",
         "obat-obatan", "erupsi", "terdampak", "award", "gratis", "bantuan",
     ],
+    # MACRO INDICATORS. No ticker to anchor on - these are keyword-only
+    # rules by construction (see DEFAULT_RULES below). Precision leans
+    # entirely on phrase-boundary matching + global_exclude, same as every
+    # other category here. Starter terms, not yet tuned against a day of
+    # real headlines the way corporate_action/ma/etc. were - see
+    # SPEC-macro-tagging.md Open Question 2.
+    "macro_bi_rate": [
+        "bi rate", "suku bunga acuan", "bi-rate", "rdg bi",
+        "rapat dewan gubernur",
+    ],
+    "macro_fed": [
+        "the fed", "federal reserve", "fomc", "powell", "suku bunga as",
+    ],
+    "macro_oil": [
+        # "harga minyak dunia" (world/crude), never bare "harga minyak" -
+        # that phrase also matches "harga minyak goreng" (cooking oil).
+        "harga minyak dunia", "minyak mentah", "brent", "wti", "opec",
+    ],
+    "macro_inflation": [
+        "inflasi", "deflasi", "ihk", "indeks harga konsumen",
+    ],
+    "macro_rupiah": [
+        "rupiah melemah", "rupiah menguat", "kurs rupiah", "nilai tukar",
+    ],
 }
+
+# One rule per macro indicator, OFF by default - see SPEC-macro-tagging.md.
+# Each is require_ticker=False (keyword-only, no company named) and
+# single-category, so the Options checkbox for one indicator maps to
+# exactly one rule's "enabled" flag and nothing else.
+MACRO_RULES = [
+    {
+        "name": "Macroeconomics: BI Rate",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_bi_rate"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: The Fed",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_fed"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: Oil",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_oil"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: Inflation",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_inflation"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+    {
+        "name": "Macroeconomics: Rupiah",
+        "enabled": False,
+        "tickers": [], "categories": ["macro_rupiah"],
+        "require": [], "any_of": [], "exclude": [],
+        "sources": [],
+        "min_confidence": 0.0,
+        "require_ticker": False,
+    },
+]
+
+# category id -> the label the Options checkbox and the popup both show.
+# ONE mapping, so the two can never say something different about the same
+# indicator. Dict order is the tie-break when a headline matches more than
+# one macro category at once (rare, but a popup row needs a single label).
+MACRO_LABELS = {
+    "macro_bi_rate": "BI Rate",
+    "macro_fed": "The Fed",
+    "macro_oil": "Oil",
+    "macro_inflation": "Inflation",
+    "macro_rupiah": "Rupiah",
+}
+
+
+def ensure_macro_rules(rules):
+    """Add whichever of the five macro rules are missing from `rules`,
+    disabled. Both a brand-new config.json and every config.json written
+    before this feature existed are missing all five - load_config calls
+    this on every load so the Macroeconomics checkboxes always have a rule
+    to bind to, for new and upgraded installs alike.
+
+    Identity is the rule's CATEGORY, never its name - `jciwindow`'s generic
+    Filters tab lets a user rename any rule, and a rename must not cause a
+    duplicate to be added here. An already-present macro rule, however the
+    user has since edited it (re-enabled, re-tuned, renamed), is left
+    completely alone.
+    """
+    rules = list(rules or [])
+    have = {c for r in rules for c in (r.get("categories") or [])
+            if c in MACRO_LABELS}
+    for r in MACRO_RULES:
+        if r["categories"][0] not in have:
+            rules.append(copy.deepcopy(r))
+    return rules
 
 DEFAULT_RULES = [
     {
@@ -233,7 +344,7 @@ DEFAULT_RULES = [
         "min_confidence": 0.5,
         "require_ticker": True,
     },
-]
+] + MACRO_RULES
 
 RULE_FIELDS = {
     "name": str, "enabled": bool, "tickers": list, "categories": list,

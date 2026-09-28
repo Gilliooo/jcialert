@@ -341,6 +341,49 @@ def open_window(cfg, save, sources=None, tk=None, ttk=None, messagebox=None):
             ("Down", lambda rs, i: jcioptions.move_rule(rs, i, 1))):
         tk.Button(btns, text=label, command=act_wrapped(fn)).pack(side="left")
 
+    # ---- Macroeconomics - a simplified checkbox view over five of the SAME
+    # rules the Filters tab above already edits (matched by category, see
+    # jcioptions._macro_index). No ticker needed for any of these; off by
+    # default. Toggling here or in the Filters tab keeps the other in sync,
+    # since both act on the one shared `rules` list.
+    mtab = tk.Frame(nb)
+    nb.add(mtab, text="Macroeconomics")
+    tk.Label(mtab, text="No ticker needed - matched on keywords alone. Off "
+                        "by default; check an indicator to start alerting "
+                        "on it.", anchor="w", wraplength=560, justify="left"
+             ).pack(fill="x", pady=(0, 10))
+
+    macro_vars = {}
+    all_var = tk.BooleanVar(master=root,
+                            value=jcioptions.macro_all_state(rules) == "on")
+
+    def refresh_macro():
+        state = jcioptions.macro_state(rules)
+        for cat, v in macro_vars.items():
+            v.set(state.get(cat, False))
+        all_var.set(jcioptions.macro_all_state(rules) == "on")
+
+    def toggle_all():
+        rules[:] = jcioptions.set_macro_all(rules, all_var.get())
+        refresh_macro()
+        refresh_list()
+
+    def toggle_macro(cat, v):
+        rules[:] = jcioptions.set_macro_enabled(rules, cat, v.get())
+        refresh_macro()
+        refresh_list()
+
+    tk.Checkbutton(mtab, text="Macroeconomics (all)", variable=all_var,
+                   command=toggle_all, font=("Segoe UI", 9, "bold")
+                   ).pack(anchor="w", pady=(0, 4))
+    for cat, label in jcifilter.MACRO_LABELS.items():
+        v = tk.BooleanVar(master=root,
+                          value=jcioptions.macro_state(rules).get(cat, False))
+        tk.Checkbutton(mtab, text=label, variable=v,
+                       command=lambda cat=cat, v=v: toggle_macro(cat, v)
+                       ).pack(anchor="w", padx=(18, 0), pady=1)
+        macro_vars[cat] = v
+
     # ---- collect / validate / save
     def collect():
         store_rule()

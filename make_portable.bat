@@ -39,8 +39,6 @@ copy /y "emiten.json"                  "%OUT%\" >nul || goto :fail
 copy /y "config.json"                  "%OUT%\" >nul || goto :fail
 copy /y "aliases_manual.json"          "%OUT%\" >nul || goto :fail
 copy /y "README.md"                    "%OUT%\" >nul || goto :fail
-copy /y "installer\portable\SETUP.bat"        "%OUT%\" >nul || goto :fail
-copy /y "installer\portable\REMOVE.bat"       "%OUT%\" >nul || goto :fail
 copy /y "installer\portable\READ-ME-FIRST.txt" "%OUT%\" >nul || goto :fail
 
 set "ZIP=installer\JCIAlert-%VER%-portable.zip"
@@ -52,7 +50,7 @@ echo.
 echo Done:
 for %%F in ("%ZIP%") do echo     %%~fF   ^(%%~zF bytes^)
 echo.
-echo Unzip anywhere and run SETUP.bat. No admin, no Inno Setup, no build tree.
+echo Unzip anywhere and run JCIAlert.exe. No admin, no install, no build tree.
 exit /b 0
 
 :fail

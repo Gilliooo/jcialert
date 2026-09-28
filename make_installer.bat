@@ -106,7 +106,7 @@ if not defined ISCC (
   echo       https://jrsoftware.org/isdl.php   ^(free^)
   echo.
   echo Meanwhile step 3 already built the portable zip, which installs the
-  echo app with no extra tooling at all - unzip it and run SETUP.bat:
+  echo app with no extra tooling at all - unzip it and run JCIAlert.exe:
   for %%F in ("installer\*-portable.zip") do echo       %%~fF
   goto :fail
 )

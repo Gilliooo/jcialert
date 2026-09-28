@@ -465,6 +465,58 @@ def main():
           saved and saved[0]["corner"] == "bottom left",
           saved[0].get("corner") if saved else None)
 
+    print("\n== the Macroeconomics tab ==")
+    root, saved, shown = build()
+    check("the tab exists",
+          "Macroeconomics" in [e[1] for e in log if e[0] == "tab"],
+          [e[1] for e in log if e[0] == "tab"])
+    boxes = {w.kw.get("text"): w for w in widgets(root, W)
+             if type(w).__name__ == "Checkbutton"}
+    check("the master checkbox and all five indicators are rendered",
+          {"Macroeconomics (all)", *F.MACRO_LABELS.values()} <= set(boxes),
+          sorted(boxes))
+    check("every indicator starts unchecked",
+          all(boxes[label].kw["variable"].get() is False
+              for label in F.MACRO_LABELS.values()), boxes)
+
+    boxes["Oil"].kw["variable"].set(True)
+    boxes["Oil"].kw["command"]()
+    by = {b.kw.get("text"): b for b in buttons(root)}
+    by["Save"].command()
+    got_rules = saved[0]["filters"]["rules"] if saved else []
+    oil_rule = next((r for r in got_rules
+                     if "macro_oil" in (r.get("categories") or [])), None)
+    check("checking Oil and saving enables exactly that rule",
+          oil_rule is not None and oil_rule["enabled"] is True, oil_rule)
+    check("the other four stay off",
+          sum(1 for r in got_rules
+              if set(r.get("categories") or []) & set(F.MACRO_LABELS)
+              and r["enabled"]) == 1, got_rules)
+    lb = widgets(root, Listbox)
+    check("checking Oil also updates the Filters tab's own listbox",
+          bool(lb) and any(i.startswith("[on ]") and "Macroeconomics: Oil" in i
+                           for i in lb[0].items),
+          lb[0].items if lb else None)
+
+    root, saved, shown = build()
+    boxes = {w.kw.get("text"): w for w in widgets(root, W)
+             if type(w).__name__ == "Checkbutton"}
+    boxes["Macroeconomics (all)"].kw["variable"].set(True)
+    boxes["Macroeconomics (all)"].kw["command"]()
+    check("'(all)' checks every individual indicator box too",
+          all(boxes[label].kw["variable"].get() is True
+              for label in F.MACRO_LABELS.values()), boxes)
+    by = {b.kw.get("text"): b for b in buttons(root)}
+    by["Save"].command()
+    got_rules = saved[0]["filters"]["rules"] if saved else []
+    check("'(all)' saved enables all five macro rules",
+          sum(1 for r in got_rules
+              if set(r.get("categories") or []) & set(F.MACRO_LABELS)
+              and r["enabled"]) == 5, got_rules)
+    check("and nothing else got swept up in the bulk toggle",
+          sum(1 for r in got_rules if r["enabled"]) == 6,   # 5 macro + coverage
+          [r["name"] for r in got_rules if r["enabled"]])
+
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")
     return 1 if failures else 0
 

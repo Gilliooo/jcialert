@@ -152,33 +152,20 @@ def main():
           not section(text, "Registry").strip(),
           section(text, "Registry")[:80])
 
-    print("\n== the no-tooling fallback agrees with all of it ==")
-    # SETUP.bat / REMOVE.bat ship inside the portable zip, which is the route
-    # that works on a machine with no Inno Setup. They live in
-    # installer\portable\ - SOURCE - and make_portable.bat copies them into
-    # the assembled folder. installer\install.bat and uninstall.bat were an
-    # earlier pair doing the same job from the build tree; they were deleted
-    # on 2026-09-23 rather than kept in step, since two installers that
-    # disagree is worse than one.
+    print("\n== the no-tooling fallback needs no script ==")
+    # The portable zip used to ship SETUP.bat/REMOVE.bat, installing into
+    # LOCALAPPDATA. Removed: config.json already lives beside the exe (see
+    # above), so there was nothing an install step bought except a Start Menu
+    # shortcut. Now the zip is just run-JCIAlert.exe-from-wherever-you-put-it.
     port = os.path.join(HERE, "installer", "portable")
-    bat = os.path.join(port, "SETUP.bat")
-    if os.path.exists(bat):
-        b = open(bat, encoding="utf-8").read()
-        check("SETUP.bat also installs per-user, not to Program Files",
-              "LOCALAPPDATA" in b and "ProgramFiles" not in b)
-        check("it refuses to overwrite a running exe",
-              "tasklist" in b.lower())
-        check("it copies emiten.json, not just the exe",
-              "emiten.json" in b)
-        check("and it does not clobber an existing config.json",
-              re.search(r"if not exist .*config\.json", b) is not None)
-        un = open(os.path.join(port, "REMOVE.bat"), encoding="utf-8").read()
-        check("REMOVE.bat removes the Run value",
-              jcistartup.NAME in un and "reg delete" in un.lower())
-        check("and keeps history unless asked to purge",
-              "/purge" in un)
-    else:
-        check("installer/portable carries SETUP.bat", False, bat)
+    check("SETUP.bat is gone - the portable zip installs nothing",
+          not os.path.exists(os.path.join(port, "SETUP.bat")))
+    check("REMOVE.bat is gone with it",
+          not os.path.exists(os.path.join(port, "REMOVE.bat")))
+    readme = open(os.path.join(port, "READ-ME-FIRST.txt"),
+                  encoding="utf-8").read()
+    check("READ-ME-FIRST.txt tells people to just run the exe",
+          "SETUP.bat" not in readme and "JCIAlert.exe" in readme)
     check("the superseded install.bat/uninstall.bat pair is gone",
           not os.path.exists(os.path.join(HERE, "installer", "install.bat")))
 

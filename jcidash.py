@@ -206,11 +206,14 @@ def view(rows, show_all=False, query="", source="", ticker="", status="",
         out = [r for r in out if (r.get("ticker") or "").upper() == t]
     q = (query or "").strip().lower()
     if q:
-        # Title AND ticker: typing "bbca" should find the headline that names
-        # the bank in prose as readily as the one tagged with it.
+        # Title, ticker AND categories: typing "bbca" should find the
+        # headline that names the bank in prose as readily as the one
+        # tagged with it - and typing "macro_oil" should find every macro
+        # alert tagged with that indicator, since it has no ticker to match.
         out = [r for r in out
                if q in (r.get("title") or "").lower()
-               or q in (r.get("ticker") or "").lower()]
+               or q in (r.get("ticker") or "").lower()
+               or q in (r.get("categories") or "").lower()]
     if hours:
         cut = (now or _now()).astimezone(WIB) - timedelta(hours=hours)
         out = [r for r in out if _within(r.get("ts_wib"), cut)]

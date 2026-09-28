@@ -48,6 +48,8 @@ than the format string - the format is a means, the slice is the contract.
 
 from datetime import datetime, timedelta, timezone
 
+from jcifilter import MACRO_LABELS
+
 WIB = timezone(timedelta(hours=7))
 
 # Short labels for the sector badge. IDX-IC's names are far too long for the
@@ -125,13 +127,32 @@ def _newest_first(alerts):
     return sorted(alerts, key=lambda a: posted(a.item.published), reverse=True)
 
 
+def _group_label(ticker, categories):
+    """The popup's grouping key/display label for a ticker-less alert.
+
+    A known macro indicator gets its OWN label ("Oil", "BI Rate", ...), never
+    the generic "PASAR" bucket every other ticker-less rule still falls back
+    to - two different indicators must never merge into one row. Dict order
+    in jcifilter.MACRO_LABELS breaks the tie on the rare headline that hits
+    more than one indicator at once.
+    """
+    if ticker:
+        return ticker
+    for cat_id, label in MACRO_LABELS.items():
+        if cat_id in (categories or ()):
+            return label
+    return "PASAR"
+
+
 def row_for_ticker(alerts):
-    """One row for one ticker. `alerts` must all share a ticker."""
+    """One row for one ticker (or one macro indicator, or the PASAR
+    catch-all). `alerts` must all share the same grouping label."""
     ordered = _newest_first(alerts)
     top = ordered[0]
+    label = _group_label(top.ticker, top.categories)
     return {
-        "key": f"t:{top.ticker or 'PASAR'}",
-        "ticker": top.ticker or "PASAR",
+        "key": f"t:{label}",
+        "ticker": label,
         "title": top.item.title,
         "posted": posted(top.item.published),
         "files": [story_entry(a) for a in ordered],
@@ -192,7 +213,7 @@ def rows_for(payloads):
         if hasattr(p, "alerts"):
             rows.append(row_for_group(p))       # sector rows stay whole
             continue
-        key = p.ticker or "PASAR"
+        key = _group_label(p.ticker, p.categories)
         if key not in by_ticker:
             by_ticker[key] = []
             order.append(key)

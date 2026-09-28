@@ -455,6 +455,53 @@ def main():
     check("describe says 'any ticker' when the list is empty",
           "any ticker" in F.describe(rule()), F.describe(rule()))
 
+    print("\n== macro indicators: keyword-only, no ticker required ==")
+    # Real headlines, one per indicator. No ticker in any of them - these are
+    # exactly the stories the app was previously unable to alert on at all.
+    H_BI_RATE = "BI Tahan BI Rate di Level 5,75 Persen, Sejalan Ekspektasi Pasar"
+    H_FED = "The Fed Pangkas Suku Bunga 25 Bps, IHSG Diprediksi Menguat"
+    H_OIL = "Harga Minyak Dunia Naik Usai OPEC Pangkas Produksi"
+    H_INFLATION = "Inflasi RI Agustus Tercatat 2,12 Persen Secara Tahunan"
+    H_RUPIAH = "Rupiah Melemah ke Rp15.950 per Dolar AS"
+    # The false positive this category has to avoid: cooking oil, not crude.
+    H_COOKING_OIL = "Harga Minyak Goreng Turun di Pasar Tradisional"
+
+    check("all five macro rules ship disabled by default",
+          all(r["enabled"] is False for r in F.MACRO_RULES),
+          [r["name"] for r in F.MACRO_RULES])
+    check("all five are require_ticker=False, single-category",
+          all(r["require_ticker"] is False and len(r["categories"]) == 1
+              for r in F.MACRO_RULES))
+
+    for headline, cat, label in (
+        (H_BI_RATE, "macro_bi_rate", "BI Rate"),
+        (H_FED, "macro_fed", "The Fed"),
+        (H_OIL, "macro_oil", "Oil"),
+        (H_INFLATION, "macro_inflation", "Inflation"),
+        (H_RUPIAH, "macro_rupiah", "Rupiah"),
+    ):
+        one = dict(next(r for r in F.MACRO_RULES if cat in r["categories"]),
+                   enabled=True)
+        d = fs(one).evaluate(headline, [])
+        check(f"{label}: enabling just its own rule alerts, no ticker needed",
+              d.alert is True and d.ticker is None, d)
+        check(f"{label}: the fired category is reported on the decision",
+              cat in d.categories, d.categories)
+        others = [dict(r, enabled=True) for r in F.MACRO_RULES
+                  if cat not in r["categories"]]
+        d2 = fs(others).evaluate(headline, [])
+        check(f"{label}: the OTHER four indicators do not also fire on it",
+              d2.alert is False, d2)
+
+    d = fs(dict(next(r for r in F.MACRO_RULES if "macro_oil" in r["categories"]),
+                enabled=True)).evaluate(H_COOKING_OIL, [])
+    check("Oil does not false-positive on cooking oil (minyak goreng)",
+          d.alert is False, d)
+
+    disabled_by_default = fs([dict(r) for r in F.MACRO_RULES]).evaluate(H_OIL, [])
+    check("with no macro rule enabled (the shipped default), nothing alerts",
+          disabled_by_default.alert is False, disabled_by_default)
+
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")
     return 1 if failures else 0
 

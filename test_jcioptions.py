@@ -264,6 +264,60 @@ def main():
     check("every corner is offered to the window",
           list(O.CHOICE_FIELDS["corner"]) == list(P.CORNERS), P.CORNERS)
 
+    print("\n== the Macroeconomics checkbox group ==")
+    fresh = O.read_values(O.default_config())["rules"]
+    check("a config with no macro rules at all gets all five, seeded",
+          set(O.macro_state(fresh)) == set(F.MACRO_LABELS))
+    check("and every one starts off",
+          all(v is False for v in O.macro_state(fresh).values()),
+          O.macro_state(fresh))
+    check("'(all)' reads as off when none are enabled",
+          O.macro_all_state(fresh) == "off")
+
+    one_on = O.set_macro_enabled(fresh, "macro_oil", True)
+    check("checking Oil enables only Oil's rule",
+          O.macro_state(one_on) == {**O.macro_state(fresh), "macro_oil": True},
+          O.macro_state(one_on))
+    def non_macro_enabled(rules):
+        return [r["enabled"] for r in rules
+                if not (set(r.get("categories") or []) & set(F.MACRO_LABELS))]
+    check("non-macro rules are untouched by toggling one indicator",
+          non_macro_enabled(one_on) == non_macro_enabled(fresh), one_on)
+    check("exactly one macro rule is now enabled",
+          sum(1 for r in one_on
+              if set(r.get("categories") or []) & set(F.MACRO_LABELS)
+              and r["enabled"]) == 1, one_on)
+    check("'(all)' now reads as mixed",
+          O.macro_all_state(one_on) == "mixed")
+
+    all_on = O.set_macro_all(fresh, True)
+    check("'(all)' checked enables every indicator",
+          all(O.macro_state(all_on).values()), O.macro_state(all_on))
+    check("and '(all)' itself now reads as on", O.macro_all_state(all_on) == "on")
+    all_off = O.set_macro_all(all_on, False)
+    check("'(all)' unchecked disables every indicator",
+          not any(O.macro_state(all_off).values()), O.macro_state(all_off))
+    check("it does not touch non-macro rules",
+          O.macro_state(all_on) == O.macro_state(
+              O.set_macro_all(
+                  O.add_rule(fresh, O.new_rule("unrelated")), True)))
+
+    check("toggling a macro rule never changes its category or require_ticker",
+          all(r["categories"] == ["macro_oil"] and r["require_ticker"] is False
+              for r in one_on if "macro_oil" in (r.get("categories") or [])))
+
+    already_there = O.read_values(O.default_config())["rules"]
+    edited = O.set_macro_enabled(already_there, "macro_oil", True)
+    reread = O.macro_state(O.read_values(
+        {"filters": {"rules": edited, "categories": F.DEFAULT_CATEGORIES}})["rules"])
+    check("read_values does not duplicate a macro rule that already exists",
+          sum(1 for r in O.read_values(
+              {"filters": {"rules": edited,
+                           "categories": F.DEFAULT_CATEGORIES}})["rules"]
+              if "macro_oil" in (r.get("categories") or [])) == 1)
+    check("and preserves the enabled state that was already saved",
+          reread["macro_oil"] is True, reread)
+
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")
     return 1 if failures else 0
 

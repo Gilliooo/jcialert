@@ -1,20 +1,16 @@
-JCIAlert 1.0.1 - Indonesian market news alerts
+JCIAlert - Indonesian market news alerts
 ==============================================
 
-TO INSTALL
-    Double-click  SETUP.bat
+TO RUN
+    Double-click  JCIAlert.exe
 
-    Installs into your own user profile
-    (%LOCALAPPDATA%\Programs\JCIAlert). No admin rights, no UAC prompt.
-    Adds a Start Menu shortcut and starts the app.
-
-TO REMOVE
-    Double-click  REMOVE.bat        keeps your settings and history
-                  REMOVE.bat /purge deletes those too
+    Nothing to install. Settings, history and logs are written right here,
+    next to the exe - so this whole folder is the app. Move the folder,
+    move the app; copy it, copy the app.
 
 
 THREE THINGS THAT SURPRISE PEOPLE
----------------------------------
+----------------------------------
 
 1. NO TRAY ICON? Look under the ^ chevron in the tray first.
    Windows 11 hides new tray icons there by default. Drag it out to pin it.
@@ -33,7 +29,7 @@ THREE THINGS THAT SURPRISE PEOPLE
 
 IF IT STILL DOESN'T APPEAR
 --------------------------
-    "%LOCALAPPDATA%\Programs\JCIAlert\JCIAlert.exe" --doctor
+    JCIAlert.exe --doctor
 
 It checks every reason it can fail to start - missing files, a folder it
 can't write to, a broken config, a second copy already running - and says

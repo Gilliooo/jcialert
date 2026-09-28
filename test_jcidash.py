@@ -38,9 +38,10 @@ def item(tid, title, when=NOW, source="katadata", cat=""):
 
 
 def rec(title, status="alert", reason="", ticker="BBCA", rule="My coverage",
-        source="katadata", hits=(), when=NOW):
+        source="katadata", hits=(), when=NOW, categories=None):
     return E.Record(item(title[:8], title, when, source), hits, ticker,
-                    "Financials", {"earnings"}, rule, status, reason, 7)
+                    "Financials", categories or {"earnings"}, rule, status,
+                    reason, 7)
 
 
 def main():
@@ -120,6 +121,22 @@ def main():
           len(D.view(rows, show_all=True, query="bmri")) == 1)
     check("status narrows without widening",
           len(D.view(rows, show_all=True, status="alert")) == 2)
+
+    print("\n== search also reaches categories, for tickerless macro rows ==")
+    macro_rows = [
+        D.row_of(rec("Harga Minyak Dunia Naik", ticker="", rule="Macroeconomics: Oil",
+                     categories={"macro_oil"}), NOW),
+        D.row_of(rec("BI Tahan BI Rate", ticker="", rule="Macroeconomics: BI Rate",
+                     categories={"macro_bi_rate"}), NOW),
+    ]
+    check("query matches by category even though the word isn't in the title "
+          "or ticker", len(D.view(macro_rows, show_all=True,
+                                   query="macro_oil")) == 1)
+    check("and it finds the right one",
+          D.view(macro_rows, show_all=True, query="macro_oil")[0]["title"]
+          == "Harga Minyak Dunia Naik")
+    check("a query matching neither category returns nothing",
+          len(D.view(macro_rows, show_all=True, query="macro_rupiah")) == 0)
 
     print("\n== the age window keeps undated rows ==")
     old = D.row_of(rec("stale story", when=NOW - timedelta(hours=30)), NOW)

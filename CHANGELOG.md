@@ -2,6 +2,49 @@
 
 Dates are when the change was made, not when it was released.
 
+## 1.2 — 2026-09-28
+
+### Added
+
+- **Macroeconomics alerting: BI Rate, The Fed, Oil, Inflation, Rupiah — no
+  ticker needed.** Options has a new "Macroeconomics" section: a master
+  "(all)" checkbox plus one per indicator, all off by default. Checking one
+  lets keyword-matched headlines for that indicator alert even though no
+  company is named. Fires under its own label in the popup ("OIL", "BI
+  RATE", ...) instead of the generic ticker-less "PASAR" bucket, and is
+  filterable in the dashboard the same way `ticker` already is.
+
+  These are ordinary rules underneath — the same `require_ticker: False` +
+  `categories` mechanism the Filters tab already exposed, five of them
+  pre-defined and given a dedicated checkbox each, so no config-editing is
+  needed to turn one on. See `SPEC-macro-tagging.md` for the full design.
+
+  Keyword lists are a starting point, not yet tuned against a day of real
+  headlines the way the corporate-action/M&A/etc. categories were — expect
+  to adjust `macro_*` in `jcifilter.DEFAULT_CATEGORIES` after real usage.
+
+### Fixed
+
+- **`build.bat` popped a real, blocking Windows error dialog on every run.**
+  `test_jcidoctor.py` called the actual `MessageBoxW` (title `"t"`, text
+  `"m"`) to check `jcidoctor.tell()`'s contract, instead of stubbing the
+  Win32 call. `run_tests.bat` runs that suite, and `build.bat` runs
+  `run_tests.bat` first — so every build sat there until someone clicked OK.
+
+### Changed
+
+- **The portable zip no longer installs anything.** `SETUP.bat`/`REMOVE.bat`
+  copied the exe into `%LOCALAPPDATA%\Programs\JCIAlert` — pure overhead,
+  since `config.json` already lives beside the exe wherever it runs. The zip
+  is now just `JCIAlert.exe` + data; unzip and run it.
+
+  **If you installed with the old `SETUP.bat`:** if you ever turned on
+  autostart from the tray, disable it there (or run the old `REMOVE.bat`
+  once more) *before* deleting `%LOCALAPPDATA%\Programs\JCIAlert` by hand.
+  Deleting the folder first leaves a dead entry in
+  `HKCU\...\CurrentVersion\Run` that Windows retries and fails at every
+  login — harmless, but nothing ships to clean it up anymore.
+
 ## 1.1 — 2026-09-23
 
 ### Fixed

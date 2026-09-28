@@ -11,6 +11,7 @@ Every branch is driven against a real temporary folder rather than a mocked
 filesystem, because the interesting cases are all filesystem facts.
 """
 
+import ctypes
 import os
 import shutil
 import sys
@@ -133,8 +134,23 @@ def main():
             os.remove(where)
         except OSError:
             pass
-    check("tell() never raises off Windows - it just reports it could not",
-          D.tell("t", "m") in (True, False))
+    # tell() calls the REAL MessageBoxW - it has to, that is the point of it
+    # (see the docstring: "the one output that survives almost anything").
+    # Calling it unpatched here would pop a real, modal, blocking dialog on
+    # every test run, i.e. every build.bat - stub the Win32 call so the
+    # contract (never raises, returns True/False) is checked without a human
+    # required to click OK to unblock the build.
+    if os.name == "nt":
+        real_msgbox = ctypes.windll.user32.MessageBoxW
+        ctypes.windll.user32.MessageBoxW = lambda *a, **k: 1
+        try:
+            check("tell() never raises off Windows - it just reports it "
+                  "could not", D.tell("t", "m") in (True, False))
+        finally:
+            ctypes.windll.user32.MessageBoxW = real_msgbox
+    else:
+        check("tell() never raises off Windows - it just reports it could "
+              "not", D.tell("t", "m") in (True, False))
 
     print("\n== the whole run, wired as the tray calls it ==")
     good = tempfile.mkdtemp()

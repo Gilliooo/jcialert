@@ -51,15 +51,12 @@ only `JCIAlert.exe` and `emiten.json` — your `config.json`, `seen.json`,
 `news.csv`, `logs\` stay untouched. Uninstaller asks before deleting them.
 
 **No Inno Setup / blocked installers:** unzip
-`installer\JCIAlert-<version>-portable.zip` and run:
+`installer\JCIAlert-<version>-portable.zip` and run `JCIAlert.exe` — nothing
+to install. Settings and history are written next to the exe, so the whole
+folder is the app; delete the folder to remove it.
 
-```
-SETUP.bat      installs into your profile, Start Menu shortcut, starts it
-REMOVE.bat     removes it   (/purge also deletes settings + history)
-```
-
-Neither installer is signed — SmartScreen will warn once ("More info" →
-"Run anyway").
+Neither the installer nor the portable exe is signed — SmartScreen will warn
+once ("More info" → "Run anyway").
 
 ## How to use it
 

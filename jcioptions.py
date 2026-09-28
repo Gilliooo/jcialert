@@ -97,8 +97,12 @@ def read_values(cfg):
     out["watchlist"] = "\n".join(cfg.get("watchlist") or [])
     out["global_exclude"] = "\n".join(
         (cfg.get("filters") or {}).get("global_exclude") or [])
-    out["rules"] = copy.deepcopy((cfg.get("filters") or {}).get("rules")
-                                 or base["filters"]["rules"])
+    rules = (cfg.get("filters") or {}).get("rules") or base["filters"]["rules"]
+    # A config saved before macro rules existed has none of the five - seed
+    # them here (disabled) so the Macroeconomics section always has a rule
+    # to bind to, for a brand-new install and an upgraded one alike. Not
+    # written to disk until the window actually Saves.
+    out["rules"] = jcifilter.ensure_macro_rules(copy.deepcopy(rules))
     out["categories"] = copy.deepcopy((cfg.get("filters") or {}).get("categories")
                                       or base["filters"]["categories"])
     out["sources"] = copy.deepcopy(cfg.get("sources") or {})
@@ -233,6 +237,59 @@ def rule_lines(rules):
     return [(("on " if r.get("enabled", True) else "off"),
              r.get("name") or "(unnamed)", describe(r))
             for r in rules or []]
+
+
+# --------------------------------------------------- the Macroeconomics group
+
+def _macro_index(rules, category):
+    """Which rule in `rules` owns this macro category, if any. Matched by
+    category, never by name - see jcifilter.ensure_macro_rules for why."""
+    for i, r in enumerate(rules or []):
+        if category in (r.get("categories") or []):
+            return i
+    return None
+
+
+def macro_state(rules):
+    """category id -> whether its rule is enabled. Always all five keys,
+    even if `rules` somehow lacks one (read_values always seeds them first,
+    but this stays honest - a missing rule reads as off, not an error)."""
+    out = {}
+    for cat in jcifilter.MACRO_LABELS:
+        i = _macro_index(rules, cat)
+        out[cat] = bool(rules[i].get("enabled", False)) if i is not None else False
+    return out
+
+
+def macro_all_state(rules):
+    """"on" if every indicator is enabled, "off" if none are, "mixed"
+    otherwise - what the "(all)" checkbox shows. It is display-only,
+    derived state; there is no config key for it."""
+    vals = set(macro_state(rules).values())
+    if vals == {True}:
+        return "on"
+    if vals == {False}:
+        return "off"
+    return "mixed"
+
+
+def set_macro_enabled(rules, category, value):
+    """Flip one indicator's rule. A category the rules list somehow lacks
+    (should not happen after read_values) is left alone rather than guessed
+    at - toggling a checkbox must never invent a rule."""
+    i = _macro_index(rules, category)
+    return set_enabled(rules, i, value) if i is not None else list(rules or [])
+
+
+def set_macro_all(rules, value):
+    """The "(all)" checkbox: sets all five indicators' enabled flag to
+    `value` in one action. Bulk convenience only, confirmed - not a master
+    gate. It holds no state of its own; checking one indicator afterwards
+    behaves exactly like checking it from any other starting point."""
+    out = list(rules or [])
+    for cat in jcifilter.MACRO_LABELS:
+        out = set_macro_enabled(out, cat, value)
+    return out
 
 
 # --------------------------------------------------------------- the numbers

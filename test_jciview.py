@@ -294,6 +294,42 @@ def main():
           "merge_rows(live[" in open("jcipopup.py", encoding="utf-8").read(),
           None)
 
+    print("\n== macro indicators group under their OWN label, never PASAR ==")
+
+    def macro_alert(categories, title, cid=1, when=T):
+        it = S.Item("iqplus", f"i{cid}", title, f"http://x/{cid}", when)
+        return E.Alert(it, None, "Macroeconomics", set(categories), cid,
+                       "", [], [("iqplus", it.url, when)])
+
+    oil = macro_alert(["macro_oil"], "Harga Minyak Dunia Naik")
+    bi = macro_alert(["macro_bi_rate"], "BI Tahan BI Rate di Level 5,75%")
+    rows = V.rows_for([oil, bi])
+    check("two different indicators produce two rows, not one",
+          len(rows) == 2, [r["ticker"] for r in rows])
+    check("Oil is labeled Oil, not PASAR",
+          any(r["ticker"] == "Oil" for r in rows), [r["ticker"] for r in rows])
+    check("BI Rate is labeled BI Rate, not PASAR",
+          any(r["ticker"] == "BI Rate" for r in rows),
+          [r["ticker"] for r in rows])
+    check("neither collapses into the generic PASAR bucket",
+          not any(r["ticker"] == "PASAR" for r in rows),
+          [r["ticker"] for r in rows])
+
+    two_oil = [macro_alert(["macro_oil"], "Harga Minyak Dunia Naik", cid=1),
+               macro_alert(["macro_oil"], "OPEC Pangkas Produksi", cid=2)]
+    rows2 = V.rows_for(two_oil)
+    check("two stories about the SAME indicator still merge into one row",
+          len(rows2) == 1 and rows2[0]["count"] == 2, rows2)
+
+    unknown = macro_alert([], "Headline With No Ticker And No Known Category")
+    r = V.row_for_alert(unknown)
+    check("a ticker-less alert matching no known indicator still falls back "
+          "to PASAR", r["ticker"] == "PASAR", r["ticker"])
+
+    check("a real ticker is unaffected by any of this",
+          V.row_for_alert(alert("BBCA", "BBCA Tebar Dividen"))["ticker"]
+          == "BBCA")
+
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")
     return 1 if failures else 0
 
