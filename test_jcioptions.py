@@ -318,6 +318,31 @@ def main():
     check("and preserves the enabled state that was already saved",
           reread["macro_oil"] is True, reread)
 
+    # Reported bug: an existing config.json whose `categories` dict predates
+    # this feature (real entries, none of them macro_*) got the five macro
+    # RULES seeded fine, but nothing seeded the matching macro CATEGORIES -
+    # so validate() rejected every one of them as "unknown category". Opening
+    # Options on any pre-existing config hit this, every time.
+    pre_existing = {
+        "filters": {
+            "categories": {k: v for k, v in F.DEFAULT_CATEGORIES.items()
+                          if not k.startswith("macro_")},
+            "rules": [dict(O.new_rule("My coverage"), tickers=["BBCA"])],
+            "global_exclude": [],
+        }
+    }
+    check("an old config's categories dict really is missing the macro ones",
+          "macro_oil" not in pre_existing["filters"]["categories"])
+    v = O.read_values(pre_existing)
+    check("read_values seeds the missing macro categories too, not just rules",
+          set(F.MACRO_LABELS) <= set(v["categories"]), sorted(v["categories"]))
+    check("and keeps every category the old config already had",
+          set(pre_existing["filters"]["categories"]) <= set(v["categories"]))
+    errs = O.validate(v, pre_existing)
+    check("an old config's five seeded macro rules validate cleanly - the "
+          "actual bug: this used to report 5 'unknown category' errors",
+          errs == [], errs)
+
     print("\n%d checks failed" % len(failures) if failures else "\nall checks passed")
     return 1 if failures else 0
 

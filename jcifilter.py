@@ -312,6 +312,21 @@ def ensure_macro_rules(rules):
             rules.append(copy.deepcopy(r))
     return rules
 
+
+def ensure_macro_categories(categories):
+    """Add whichever of the five `macro_*` keyword bundles are missing from
+    `categories`. Same reason as ensure_macro_rules, and the bug that made it
+    necessary: a rule naming `macro_oil` in its categories list is useless -
+    `validate()` rejects it as "unknown category" - if `macro_oil` itself was
+    never added to the categories dict. An existing config.json's categories
+    are kept completely as they are; only the five missing keys are added.
+    """
+    out = dict(categories or {})
+    for cat, terms in DEFAULT_CATEGORIES.items():
+        if cat in MACRO_LABELS and cat not in out:
+            out[cat] = list(terms)
+    return out
+
 DEFAULT_RULES = [
     {
         "name": "My coverage - everything",

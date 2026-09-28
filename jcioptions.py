@@ -103,8 +103,13 @@ def read_values(cfg):
     # to bind to, for a brand-new install and an upgraded one alike. Not
     # written to disk until the window actually Saves.
     out["rules"] = jcifilter.ensure_macro_rules(copy.deepcopy(rules))
-    out["categories"] = copy.deepcopy((cfg.get("filters") or {}).get("categories")
-                                      or base["filters"]["categories"])
+    categories = ((cfg.get("filters") or {}).get("categories")
+                  or base["filters"]["categories"])
+    # The macro rules above name categories like "macro_oil" - seeding the
+    # rule without also seeding this makes validate() reject it as an
+    # unknown category. Same migration, same reason, must not be split.
+    out["categories"] = jcifilter.ensure_macro_categories(
+        copy.deepcopy(categories))
     out["sources"] = copy.deepcopy(cfg.get("sources") or {})
     return out
 
